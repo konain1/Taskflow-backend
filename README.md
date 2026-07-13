@@ -1,55 +1,79 @@
-# Taskflow Backend
+# Taskflow Backend 🚀
 
-Backend setup for the Taskflow assignment.
+Welcome to the **Taskflow Backend** repository! This is a Node.js and Express-based backend application designed for managing tasks, users, and projects. 
 
-## Project Structure
+---
 
-The project follows a modular structure where files are divided based on their roles:
+## 🛠️ Features & Integrations
 
-- **server.js**: The main entry point of the application. It initializes database connections and starts the Express server.
-- **app.js**: Configures the Express application, middlewares, and routing.
-- **src/**: Contains subfolders for clean code organization:
-  - `config/`: Configuration files for databases and logger.
-  - `controllers/`: Handles incoming HTTP request payloads and sends responses.
-  - `middlewares/`: Custom express middleware functions.
-  - `models/`: Database models and schemas.
-  - `routes/`: Express route definitions.
-  - `services/`: Business logic layer.
-  - `utils/`: Reusable helper functions.
-  - `validators/`: Input validation schemas.
+- **Authentication System**: Fully secure User registration & Login (Password hashing using `bcrypt` and token generation using `JSON Web Tokens (JWT)`).
+- **MongoDB (Mongoose)**: Robust object modeling for database schemas.
+- **Redis (ioredis)**: High-performance caching integration.
+- **Structured Logging**: Clean, formatted console logs via `pino` and `pino-pretty`.
 
-## Configured Integrations
+---
 
-- **MongoDB (Mongoose)**: Set up to manage schema-based data.
-- **Redis (ioredis)**: Configured for caching and session management.
-- **Pino Logger**: Structured logging configuration for fast, clean, and readable logs.
+## 📂 Project Organization (Simple Explanation)
 
-## Database Models
+At the root of the project, you will find:
+- `server.js` - Starts the backend server and connects to databases.
+- `app.js` - Sets up the Express app configuration and routing.
 
-- **User**: Stores user profiles (name, email, password, and roles: `admin`, `member`) with secure password hashing.
-- **Product**: Represents projects/products including attributes like title, description, owner, and members.
-- **Task**: Tasks under a project containing title (with search support), description, status, assignee, priority, and due date.
+All other core code is organized inside the `src/` directory:
+- **`config/`** - Setup files for databases (MongoDB & Redis) and logging.
+- **`controllers/`** - Receives incoming API requests and sends back responses.
+- **`models/`** - Defines how database collections look (Schemas).
+- **`routes/`** - Directs API URLs to the correct controllers (e.g. `/register`).
+- **`services/`** - Contains the actual business logic (e.g., verifying credentials, saving users).
+- **`utils/`** - Small helper files like password hashing and JWT token generator.
+- **`validators/`** - Validates the format of user input data.
 
-## Getting Started
+---
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/konain1/Taskflow-backend.git
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd Taskflow-backend
-   ```
-3. Configure your local variables inside a `.env` file (e.g. `PORT`, `MONGODB_URI`, `REDIS_URL`).
-4. Install dependencies:
-   ```bash
-   npm install
-   ```
-5. Run the server:
-   ```bash
-   npm start
-   ```
+## 🗄️ Database Schemas
 
-## License
+1. **User Model** (`user.model.js`):
+   - Stores user profiles (name, email, password, roles: `admin` or `member`).
+2. **Product Model** (`product.model.js`):
+   - Represents a product/project with title, owner, and members.
+3. **Task Model** (`task.model.js`):
+   - Represents tasks under a project. Includes title, assignee, status (`todo`, `in-progress`, `done`), priority (`low`, `medium`, `high`), and due date.
 
+---
+
+## 🚀 How to Run the Project Locally
+
+Follow these simple steps to run the server on your computer:
+
+### 1. Clone the project
+```bash
+git clone https://github.com/konain1/Taskflow-backend.git
+cd Taskflow-backend
+```
+
+### 2. Configure Environment Variables
+Create a file named `.env` in the root folder and add the following settings:
+```env
+PORT=3099
+MONGODB_URI=your_mongodb_connection_uri
+REDIS_URL=redis://localhost:6379
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRES_IN=1d
+NODE_ENV=development
+```
+
+### 3. Install Dependencies
+```bash
+npm install
+```
+
+### 4. Start the Server
+```bash
+npm start
+```
+The server will connect to MongoDB and Redis and start listening for requests!
+
+---
+
+## 📝 License
 ISC
