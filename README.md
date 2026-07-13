@@ -24,6 +24,12 @@ The project follows a modular structure where files are divided based on their r
 - **Redis (ioredis)**: Configured for caching and session management.
 - **Pino Logger**: Structured logging configuration for fast, clean, and readable logs.
 
+## Database Models
+
+- **User**: Stores user profiles (name, email, password, and roles: `admin`, `member`) with secure password hashing.
+- **Product**: Represents projects/products including attributes like title, description, owner, and members.
+- **Task**: Tasks under a project containing title (with search support), description, status, assignee, priority, and due date.
+
 ## Getting Started
 
 1. Clone the repository:
