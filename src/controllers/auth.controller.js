@@ -1,5 +1,5 @@
 const logger = require("../config/logger");
-const registerService = require("../services/auth.service");
+const { registerService, loginService } = require("../services/auth.service");
 
 
 const register = async (req,res)=>{
@@ -7,7 +7,7 @@ const register = async (req,res)=>{
     try {
        
         const response = await registerService(req.body);
-        console.log( " sss",response)
+     
 
         if(!response){
             logger.error({response},"unable to register ")
@@ -31,4 +31,27 @@ const register = async (req,res)=>{
     
 }
 
-module.exports = register
+const login = async (req, res) => {
+    
+    try {
+        const response = await loginService(req.body);
+        if (!response) {
+            logger.error({ response }, "Invalid credials ")
+            return res.status(401).json({message:"login failed !"})
+        }
+        logger.info({ email: req.body.email }, "login successfully done")
+        return res.status(200).json({ success: true, data: response })
+
+    } catch (error) {
+        logger.error(error, "login failed!")
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error"
+        })
+    }
+}
+
+module.exports = {
+    register,
+    login
+};

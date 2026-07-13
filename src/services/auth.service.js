@@ -1,6 +1,8 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const logger = require("../config/logger");
 const User = require("../models/user.model");
-const generateAccessToken = require("../utils/accessToken.util");
+const { generateAccessToken, verifyAccessToken } = require("../utils/accessToken.util");
 const hashPassword = require("../utils/hashPassword.util");
 
 const registerService = async (data) => {
@@ -17,7 +19,6 @@ const registerService = async (data) => {
 
         const hashedPassword = await hashPassword(password)
 
-        // 2. Create new user (password is automatically hashed by model pre-save hook)
         const newUser = await User.create({
             name,
             email,
@@ -25,7 +26,7 @@ const registerService = async (data) => {
             role,
         });
 
-        // 3. Generate JWT access token
+       //Generate JWT access token
         const token = generateAccessToken({
             id: newUser._id,
             email: newUser.email,
@@ -48,4 +49,51 @@ const registerService = async (data) => {
     }
 };
 
-module.exports = registerService;
+const loginService = async (data) => {
+    try {
+        const { email, password, token } = data;
+
+
+        if (!email || !password) {
+            logger.warn({ email }, "Missing email or password for login");
+            throw new Error("Email and password are required");
+        }
+
+        const user = await User.findOne({ email }).select('+password');
+        if (!user) {
+            logger.warn({ email }, "User not found for login");
+            throw new Error("Invalid credentials");
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            logger.warn({ email }, "Invalid password attempt");
+            throw new Error("Invalid credentials");
+        }
+
+        const newToken = generateAccessToken({
+            id: user._id,
+            email: user.email,
+            role: user.role,
+        });
+
+        return {
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            token: newToken,
+        };
+
+    } catch (error) {
+        logger.error(error, "Error in loginService");
+        throw error;
+    }
+};
+
+module.exports = {
+    registerService,
+    loginService,
+};
