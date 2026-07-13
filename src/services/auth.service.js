@@ -1,6 +1,7 @@
 const logger = require("../config/logger");
 const User = require("../models/user.model");
 const generateAccessToken = require("../utils/accessToken.util");
+const hashPassword = require("../utils/hashPassword.util");
 
 const registerService = async (data) => {
     try {
@@ -14,11 +15,13 @@ const registerService = async (data) => {
             throw new Error("User already exists!");
         }
 
+        const hashedPassword = await hashPassword(password)
+
         // 2. Create new user (password is automatically hashed by model pre-save hook)
         const newUser = await User.create({
             name,
             email,
-            password,
+            password:hashedPassword,
             role,
         });
 

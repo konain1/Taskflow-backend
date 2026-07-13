@@ -7,6 +7,7 @@ const register = async (req,res)=>{
     try {
        
         const response = await registerService(req.body);
+        console.log( " sss",response)
 
         if(!response){
             logger.error({response},"unable to register ")
