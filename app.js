@@ -1,7 +1,12 @@
-const dotenv = require('dotenv').config()
-const express = require('express')
+const express = require('express');
 
-const app = express()
+const app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.listen(process.env.PORT,()=>console.log('port is running on ',process.env.PORT))
+// app.get('/health', (req, res) => {
+//   res.status(200).json({ status: 'OK' });
+// });
+
+module.exports = app;
