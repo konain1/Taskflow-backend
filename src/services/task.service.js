@@ -223,7 +223,7 @@ const deleteTaskService = async (taskId, userId, userRole) => {
         }
 
        let response= await Task.findByIdAndDelete(taskId).populate("assignee");
-        logger.info({ taskId }, "Task deleted successfully");
+        logger.info({ taskId}, "Task deleted successfully");
         return response;
     } catch (error) {
         logger.error(error, "Error in deleteTaskService");
