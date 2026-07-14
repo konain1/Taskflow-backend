@@ -1,6 +1,6 @@
 const { register, login } = require("../controllers/auth.controller");
 const protect = require("../middlewares/auth.middleware");
-const authorize = require('../middlewares/authorise.middleware')
+const authorize = require('../middlewares/authorise.middleware');
 
 const routes = (app) => {
     app.post('/taskflow/api/v1/register', register);
