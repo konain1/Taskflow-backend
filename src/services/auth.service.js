@@ -4,10 +4,18 @@ const logger = require("../config/logger");
 const User = require("../models/user.model");
 const { generateAccessToken, verifyAccessToken } = require("../utils/accessToken.util");
 const hashPassword = require("../utils/hashPassword.util");
+const {userSchema} = require('../middlewares/validate.middleware')
 
 const registerService = async (data) => {
     try {
         const { name, email, password, role } = data;
+
+        const result =  userSchema.safeParse({ name, email, password, role });
+
+        if (!result.success) {
+            logger.warn({ email }, 'Signup attempt with invalid data');
+            return ;
+        }
 
         // 1. Check if user already exists
         const existingUser = await User.findOne({ email });
@@ -53,7 +61,7 @@ const loginService = async (data) => {
     try {
         const { email, password, token } = data;
 
-
+        
         if (!email || !password) {
             logger.warn({ email }, "Missing email or password for login");
             throw new Error("Email and password are required");
