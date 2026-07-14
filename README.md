@@ -9,7 +9,7 @@ This is the backend server for **Taskflow**, a simple web application to manage 
 - **Database**: Stores all user and project data in MongoDB.
 - **Caching**: Configured with Redis for high performance.
 - **Logging**: Uses Pino for clean console logs.
-- **Robust Security**: Users can only see, edit, or delete projects they own or are members of.
+- **Robust Security**: Users can only see, edit, or delete projects/tasks they own or are members of.
 
 ---
 
@@ -27,11 +27,20 @@ This is the backend server for **Taskflow**, a simple web application to manage 
 ---
 
 ## 🔒 Security Rules (Who can do what?)
+
+### Projects
 - **Create Project**: Any authenticated (logged-in) user can create a project. The creator becomes the project `owner` and first `member`.
 - **Fetch Projects**: Users can only get a list of projects they own or are added as members to.
 - **Fetch Single Project details**: Allowed only if the user is the owner or a member of that project.
 - **Update Project**: Allowed only if the user is the owner or a member of that project.
 - **Delete Project**: Allowed only if the user is the project owner OR an admin.
+- **Add Members**: Allowed only if the user is the project owner.
+
+### Tasks
+- **Create Task**: Allowed only if the creator is the project owner or a project member. Assigned users must also be members of the project.
+- **Fetch/Read Tasks**: Allowed only if the user is the project owner or a project member.
+- **Update Task**: Allowed only if the user is the project owner or a project member.
+- **Delete Task**: Allowed only if the user is the project owner or a project member (generic admin who is not associated is blocked).
 
 ---
 
@@ -48,6 +57,20 @@ This is the backend server for **Taskflow**, a simple web application to manage 
 - `GET /taskflow/api/v1/project/:id` - Get details of a specific project.
 - `PUT /taskflow/api/v1/project/:id` - Update project details.
 - `DELETE /taskflow/api/v1/delete/:id` - Delete a project.
+- `POST /taskflow/api/v1/project/:projectId/add-member` - Add a member to a project.
+
+### Tasks (Requires Authorization Header: `Bearer <token>`)
+- `POST /taskflow/api/v1/tasks` - Create a new task (body: `title`, `project`, optional: `assignee`, `description`, `status`, `dueDate`, `priority`).
+- `GET /taskflow/api/v1/projects/:projectId/tasks` - Fetch tasks inside a project with pagination and query filters:
+  - **Query Params**:
+    - `page` (number, default: 1)
+    - `limit` (number, default: 10)
+    - `search` (case-insensitive partial title search)
+    - `status` ('todo', 'in-progress', 'done')
+    - `priority` ('low', 'medium', 'high')
+    - `startDate` & `endDate` (range search on task `dueDate` using `YYYY-MM-DD` format)
+- `PUT /taskflow/api/v1/tasks/:id` - Update a task.
+- `DELETE /taskflow/api/v1/tasks/:id` - Delete a task.
 
 ---
 
