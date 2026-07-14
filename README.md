@@ -46,10 +46,11 @@ This is the backend server for **Taskflow**, a simple web application to manage 
 
 ## 🔌 API Routes (Endpoints)
 
-### Authentication
+### Authentication & Server Health
 - `POST /taskflow/api/v1/register` - Create a new user account.
 - `POST /taskflow/api/v1/login` - Login to get a JWT token.
 - `GET /taskflow/api/v1/test` - Test route to verify token validation.
+- `GET /taskflow/api/v1/health` - Check backend and database connectivity health status.
 
 ### Projects (Requires Authorization Header: `Bearer <token>`)
 - `POST /taskflow/api/v1/create` - Create a new project.
