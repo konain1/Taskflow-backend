@@ -5,6 +5,8 @@ const {
     deleteTaskService,
 } = require('../services/task.service');
 
+const { taskQuerySchema } = require('../middlewares/validate.middleware');
+
 const createTask = async (req, res, next) => {
     try {
         const response = await createTaskService(req.body, req.user._id);
@@ -21,8 +23,16 @@ const createTask = async (req, res, next) => {
 const fetchTasks = async (req, res, next) => {
     try {
         const { projectId } = req.params;
-        // Optional search, status, and priority query filters
-        const response = await fetchTasksService(projectId, req.user._id, req.query);
+        
+        // Validate and coerce request query parameters
+        const validation = taskQuerySchema.safeParse(req.query);
+        if (!validation.success) {
+            const error = new Error(validation.error.errors[0].message);
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const response = await fetchTasksService(projectId, req.user._id, validation.data);
         return res.status(200).json({
             success: true,
             message: "Tasks fetched successfully",
