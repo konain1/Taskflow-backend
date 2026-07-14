@@ -1,5 +1,5 @@
 
-const { createService } = require('../services/project.service');
+const { createService , deleteService } = require('../services/project.service');
 
 const createProject = async (req, res, next) => {
     try {
@@ -15,6 +15,22 @@ const createProject = async (req, res, next) => {
     }
 };
 
+const deleteProject = async (req, res, next) => {
+    
+    try {
+        const response = await deleteService(req.params.id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Project deleted successfully",
+            data: response
+        });
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
-    createProject
+    createProject,
+    deleteProject
 };
