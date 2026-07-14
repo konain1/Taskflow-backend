@@ -27,4 +27,17 @@ const createService = async (data, userId) => {
     }
 };
 
-module.exports = { createService }
+const deleteService = async (projectId) => {
+    try {
+        const result = await Project.findByIdAndDelete({ _id: projectId })
+        logger.info({result},"project has been deleted successfully")
+        return result;
+    } catch (error) {
+        logger.error(error, "Error in project deleteService");
+        throw error;
+    }
+    
+    
+}
+
+module.exports = { createService , deleteService }

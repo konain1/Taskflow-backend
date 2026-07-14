@@ -1,10 +1,10 @@
-const { createProject } = require('../controllers/project.controller')
+const { createProject,deleteProject } = require('../controllers/project.controller')
 const protect = require('../middlewares/auth.middleware')
-
+const authorize = require('../middlewares/authorise.middleware')
 const routes = (app) => {
 
     app.post('/taskflow/api/v1/create', protect, createProject)
-    app.get('/taskflow/api/v1/test/project', protect, createProject, (req, res) => {
+    app.delete('/taskflow/api/v1/test/project/delete/:id', protect,authorize("admin"),deleteProject,(req, res) => {
             res.status(200).json({ success: true, message: "project created", user: req.user });
         });
     
