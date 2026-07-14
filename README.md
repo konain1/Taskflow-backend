@@ -1,58 +1,66 @@
 # Taskflow Backend 🚀
 
-Welcome to the **Taskflow Backend** repository! This is a Node.js and Express-based backend application designed for managing tasks, users, and projects. 
+This is the backend server for **Taskflow**, a simple web application to manage projects, tasks, and users. It is built using Node.js, Express, MongoDB (Mongoose), and Redis.
 
 ---
 
-## 🛠️ Features & Integrations
-
-- **Authentication System**: Fully secure User registration & Login (Password hashing using `bcrypt` and token generation using `JSON Web Tokens (JWT)`).
-- **MongoDB (Mongoose)**: Robust object modeling for database schemas.
-- **Redis (ioredis)**: High-performance caching integration.
-- **Structured Logging**: Clean, formatted console logs via `pino` and `pino-pretty`.
-
----
-
-## 📂 Project Organization (Simple Explanation)
-
-At the root of the project, you will find:
-- `server.js` - Starts the backend server and connects to databases.
-- `app.js` - Sets up the Express app configuration and routing.
-
-All other core code is organized inside the `src/` directory:
-- **`config/`** - Setup files for databases (MongoDB & Redis) and logging.
-- **`controllers/`** - Receives incoming API requests and sends back responses.
-- **`models/`** - Defines how database collections look (Schemas).
-- **`routes/`** - Directs API URLs to the correct controllers (e.g. `/register`).
-- **`services/`** - Contains the actual business logic (e.g., verifying credentials, saving users).
-- **`utils/`** - Small helper files like password hashing and JWT token generator.
-- **`validators/`** - Validates the format of user input data.
+## 🛠️ Features
+- **User Authentication**: Secure signup and login with hashed passwords (`bcrypt`) and session tokens (`JWT`).
+- **Database**: Stores all user and project data in MongoDB.
+- **Caching**: Configured with Redis for high performance.
+- **Logging**: Uses Pino for clean console logs.
+- **Robust Security**: Users can only see, edit, or delete projects they own or are members of.
 
 ---
 
-## 🗄️ Database Schemas
-
-1. **User Model** (`user.model.js`):
-   - Stores user profiles (name, email, password, roles: `admin` or `member`).
-2. **Product Model** (`product.model.js`):
-   - Represents a product/project with title, owner, and members.
-3. **Task Model** (`task.model.js`):
-   - Represents tasks under a project. Includes title, assignee, status (`todo`, `in-progress`, `done`), priority (`low`, `medium`, `high`), and due date.
+## 📂 Folder Structure (In Simple Words)
+- `server.js` - Starts the server and connects to databases.
+- `app.js` - Configures Express and routes.
+- **`src/config/`** - Config settings for MongoDB, Redis, and logger.
+- **`src/models/`** - Schema details for how data is structured in MongoDB (User, Project, Task).
+- **`src/routes/`** - Defines API URL paths (endpoints).
+- **`src/controllers/`** - Receives requests from routes and sends back responses.
+- **`src/services/`** - Handles database logic (e.g. creating/fetching data).
+- **`src/middlewares/`** - Middlewares for validation, token protection, error handling, and authorization checks.
+- **`src/utils/`** - Shared utilities like JWT token generator and password hasher.
 
 ---
 
-## 🚀 How to Run the Project Locally
+## 🔒 Security Rules (Who can do what?)
+- **Create Project**: Any authenticated (logged-in) user can create a project. The creator becomes the project `owner` and first `member`.
+- **Fetch Projects**: Users can only get a list of projects they own or are added as members to.
+- **Fetch Single Project details**: Allowed only if the user is the owner or a member of that project.
+- **Update Project**: Allowed only if the user is the owner or a member of that project.
+- **Delete Project**: Allowed only if the user is the project owner OR an admin.
 
-Follow these simple steps to run the server on your computer:
+---
 
-### 1. Clone the project
+## 🔌 API Routes (Endpoints)
+
+### Authentication
+- `POST /taskflow/api/v1/register` - Create a new user account.
+- `POST /taskflow/api/v1/login` - Login to get a JWT token.
+- `GET /taskflow/api/v1/test` - Test route to verify token validation.
+
+### Projects (Requires Authorization Header: `Bearer <token>`)
+- `POST /taskflow/api/v1/create` - Create a new project.
+- `GET /taskflow/api/v1/get-project` - Get all projects you belong to.
+- `GET /taskflow/api/v1/project/:id` - Get details of a specific project.
+- `PUT /taskflow/api/v1/project/:id` - Update project details.
+- `DELETE /taskflow/api/v1/delete/:id` - Delete a project.
+
+---
+
+## 🚀 How to Run Locally
+
+### 1. Clone the Project
 ```bash
 git clone https://github.com/konain1/Taskflow-backend.git
 cd Taskflow-backend
 ```
 
 ### 2. Configure Environment Variables
-Create a file named `.env` in the root folder and add the following settings:
+Create a file named `.env` in the root folder and add these lines:
 ```env
 PORT=3099
 MONGODB_URI=your_mongodb_connection_uri
@@ -67,11 +75,11 @@ NODE_ENV=development
 npm install
 ```
 
-### 4. Start the Server
+### 4. Run the Server
 ```bash
 npm start
 ```
-The server will connect to MongoDB and Redis and start listening for requests!
+The server will connect to MongoDB and start running!
 
 ---
 
