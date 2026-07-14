@@ -69,7 +69,7 @@ const fetchTasksService = async (projectId, userId, filters = {}) => {
             throw error;
         }
 
-        // Check if user has permission to fetch tasks (must be owner or member)
+        // must be owner or member
         const isOwner = project.owner.toString() === userId.toString();
         const isMember = project.members.some(memberId => memberId.toString() === userId.toString());
         if (!isOwner && !isMember) {
@@ -78,24 +78,57 @@ const fetchTasksService = async (projectId, userId, filters = {}) => {
             throw error;
         }
 
-        // Build query
+        const { page = 1, limit = 10, search, status, assignee, priority, startDate, endDate } = filters;
+        const skip = (page - 1) * limit;
+
+        // query object
         const query = { project: projectId };
 
-        // Support searching by text on title
-        if (filters.search) {
-            query.$text = { $search: filters.search };
+        // Case-insensitive regex title search
+        if (search) {
+            query.title = { $regex: search, $options: 'i' };
         }
 
-        // Support filtering by status or priority
-        if (filters.status) {
-            query.status = filters.status;
+        // Filtering options
+        if (status) {
+            query.status = status;
         }
-        if (filters.priority) {
-            query.priority = filters.priority;
+        if (assignee) {
+            query.assignee = assignee;
+        }
+        if (priority) {
+            query.priority = priority;
         }
 
-        const tasks = await Task.find(query).populate('assignee', '-password');
-        return tasks;
+        // Date range filtering on dueDate
+        if (startDate || endDate) {
+            query.dueDate = {};
+            if (startDate) {
+                query.dueDate.$gte = new Date(startDate);
+            }
+            if (endDate) {
+                query.dueDate.$lte = new Date(endDate);
+            }
+        }
+
+        // Execute count query for pagination metadata
+        const totalTasks = await Task.countDocuments(query);
+        const totalPages = Math.ceil(totalTasks / limit);
+
+        // Fetch task list (avoiding N+1 by using populate directly)
+        const tasks = await Task.find(query)
+            .skip(skip)
+            .limit(limit)
+            .populate('assignee', '-password')
+            .sort({ createdAt: -1 });
+
+        return {
+            tasks,
+            totalTasks,
+            totalPages,
+            currentPage: page,
+            limit,
+        };
     } catch (error) {
         logger.error(error, "Error in fetchTasksService");
         throw error;
@@ -189,9 +222,9 @@ const deleteTaskService = async (taskId, userId, userRole) => {
             throw error;
         }
 
-        await Task.findByIdAndDelete(taskId);
+       let response= await Task.findByIdAndDelete(taskId).populate("assignee");
         logger.info({ taskId }, "Task deleted successfully");
-        return task;
+        return response;
     } catch (error) {
         logger.error(error, "Error in deleteTaskService");
         throw error;

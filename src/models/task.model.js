@@ -38,6 +38,12 @@ const taskSchema = new mongoose.Schema({
 // Text index on title for search support
 taskSchema.index({ title: 'text' });
 
+// Query field indexes for performance
+taskSchema.index({ project: 1 });
+taskSchema.index({ assignee: 1 });
+taskSchema.index({ status: 1 });
+taskSchema.index({ dueDate: 1 });
+
 const Task = mongoose.model('Task', taskSchema);
 
 module.exports = Task;

@@ -36,8 +36,20 @@ const taskSchema = z.object({
     priority: z.enum(['low', 'medium', 'high']).optional(),
 });
 
+const taskQuerySchema = z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(10),
+    status: z.enum(['todo', 'in-progress', 'done']).optional(),
+    assignee: z.string().regex(/^[0-9a-fA-F]{24}$/, { message: "Invalid assignee ID format" }).optional(),
+    priority: z.enum(['low', 'medium', 'high']).optional(),
+    search: z.string().optional(),
+    startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Invalid startDate format (YYYY-MM-DD)" }).optional(),
+    endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Invalid endDate format (YYYY-MM-DD)" }).optional(),
+});
+
 module.exports = { 
     userSchema,
     projectSchema,
     taskSchema,
+    taskQuerySchema,
 };
