@@ -1,17 +1,19 @@
 const express = require('express');
-const routes = require('./src/routes/auth.route');
+const Authroutes = require('./src/routes/auth.route');
 const { notFound, centralErrorHandler } = require('./src/middlewares/error.middleware');
-
+const projectRoutes = require('./src/routes/project.route')
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // All Routes
-routes(app);
+Authroutes(app);
+projectRoutes(app);
 
-// Error Handling (MUST be after all routes)
-app.use(notFound);            // Catches any route that doesn't match
-app.use(centralErrorHandler); // Catches any error thrown/next(err) from controllers
+
+
+app.use(notFound);           
+app.use(centralErrorHandler); 
 
 module.exports = app;
