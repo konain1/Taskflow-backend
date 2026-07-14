@@ -27,17 +27,38 @@ const createService = async (data, userId) => {
     }
 };
 
-const deleteService = async (projectId) => {
+const deleteService = async (projectId, userId, userRole) => {
     try {
-        const result = await Project.findByIdAndDelete({ _id: projectId })
-        logger.info({result},"project has been deleted successfully")
-        return result;
+        const project = await Project.findById(projectId);
+        if (!project) {
+            const error = new Error("Project not found");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if (userRole !== 'admin' && project.owner.toString() !== userId.toString()) {
+            const error = new Error("You do not have permission to delete this project");
+            error.statusCode = 403;
+            throw error;
+        }
+
+        await Project.findByIdAndDelete(projectId);
+        logger.info({ projectId }, "project has been deleted successfully");
+        return project;
     } catch (error) {
         logger.error(error, "Error in project deleteService");
         throw error;
     }
-    
-    
-}
+};
 
-module.exports = { createService , deleteService }
+const fetchService = async () => {
+    try {
+        const response = await Project.find({}).populate("owner");
+        return response;
+    } catch (error) {
+        logger.error(error, "Error in project fetchService");
+        throw error;
+    }
+};
+
+module.exports = { createService, deleteService, fetchService };
