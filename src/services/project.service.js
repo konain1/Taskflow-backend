@@ -1,6 +1,8 @@
 const logger = require('../config/logger');
 const { projectSchema } = require('../middlewares/validate.middleware')
 const  Project  = require('../models/project.model')
+const User = require('../models/user.model')
+
 
 const createService = async (data, userId) => {
     try {
@@ -138,10 +140,60 @@ const updateProjectService = async (projectId, userId, updateData) => {
     }
 };
 
+const addMemberService = async (projectId, memberIdToAdd, userId) => {
+    try {
+        const project = await Project.findById(projectId);
+        if (!project) {
+            const error = new Error("Project not found");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        // Only the project owner can add members
+        if (project.owner.toString() !== userId.toString()) {
+            const error = new Error("Only the project owner can add members");
+            error.statusCode = 403;
+            throw error;
+        }
+
+        // Check if user to add exists in database
+        const userExists = await User.findById(memberIdToAdd);
+        if (!userExists) {
+            const error = new Error("User to add not found");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        // Check if user is already a member
+        const isAlreadyMember = project.members.some(memberId => memberId.toString() === memberIdToAdd.toString());
+        const isOwner = project.owner.toString() === memberIdToAdd.toString();
+
+        if (isAlreadyMember || isOwner) {
+            const error = new Error("User is already a member or owner of this project");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        // Add member and save
+        project.members.push(memberIdToAdd);
+        await project.save();
+
+        const response = await Project.findById(projectId)
+            .populate("owner", "-password")
+            .populate("members", "-password");
+
+        return response
+    } catch (error) {
+        logger.error(error, "Error in addMemberService");
+        throw error;
+    }
+};
+
 module.exports = { 
     createService, 
     deleteService, 
     fetchService, 
     getProjectByIdService, 
-    updateProjectService 
+    updateProjectService,
+    addMemberService
 };
