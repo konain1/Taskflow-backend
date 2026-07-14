@@ -24,4 +24,4 @@ const userSchema = z.object({
 
 
 
-module.exports = { userSchema,loginSchema };
+module.exports = { userSchema};
