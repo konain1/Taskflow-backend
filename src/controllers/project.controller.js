@@ -4,7 +4,8 @@ const {
     deleteService, 
     fetchService, 
     getProjectByIdService, 
-    updateProjectService 
+    updateProjectService,
+    addMemberService
 } = require('../services/project.service');
 
 const createProject = async (req, res, next) => {
@@ -74,10 +75,34 @@ const updateProject = async (req, res, next) => {
     }
 };
 
+const addMember = async (req, res, next) => {
+    try {
+        const { projectId } = req.params;
+        const { memberId } = req.body; // User ID to add to project members list
+
+        if (!memberId) {
+            const error = new Error("Member ID is required");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const response = await addMemberService(projectId, memberId, req.user._id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Member added to project successfully",
+            data: response
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createProject,
     deleteProject,
     fetchAllProjects,
     getProjectById,
     updateProject,
+    addMember,
 };

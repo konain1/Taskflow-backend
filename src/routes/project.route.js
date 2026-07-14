@@ -3,7 +3,8 @@ const {
     deleteProject, 
     fetchAllProjects, 
     getProjectById, 
-    updateProject 
+    updateProject,
+    addMember
 } = require('../controllers/project.controller');
 const protect = require('../middlewares/auth.middleware');
 
@@ -13,6 +14,7 @@ const routes = (app) => {
     app.get('/taskflow/api/v1/project/:id', protect, getProjectById);
     app.put('/taskflow/api/v1/project/:id', protect, updateProject);
     app.delete('/taskflow/api/v1/delete/:id', protect, deleteProject);
+    app.post('/taskflow/api/v1/project/:projectId/add-member', protect, addMember);
 };
 
 module.exports = routes;
