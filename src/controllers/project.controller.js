@@ -1,5 +1,11 @@
 
-const { createService , deleteService, fetchService } = require('../services/project.service');
+const { 
+    createService, 
+    deleteService, 
+    fetchService, 
+    getProjectByIdService, 
+    updateProjectService 
+} = require('../services/project.service');
 
 const createProject = async (req, res, next) => {
     try {
@@ -30,24 +36,48 @@ const deleteProject = async (req, res, next) => {
 };
 
 const fetchAllProjects = async (req, res, next) => {
-    
-
     try {
-        const response = await fetchService();
+        const response = await fetchService(req.user._id);
         return res.status(200).json({
             success: true,
-            message: "Project fetched successfully",
-            data : response
-        })
-        
+            message: "Projects fetched successfully",
+            data: response
+        });
     } catch (error) {
-        next(error)
+        next(error);
     }
-    
-    
-}
+};
+
+const getProjectById = async (req, res, next) => {
+    try {
+        const response = await getProjectByIdService(req.params.id, req.user._id);
+        return res.status(200).json({
+            success: true,
+            message: "Project details fetched successfully",
+            data: response
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const updateProject = async (req, res, next) => {
+    try {
+        const response = await updateProjectService(req.params.id, req.user._id, req.body);
+        return res.status(200).json({
+            success: true,
+            message: "Project updated successfully",
+            data: response
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createProject,
     deleteProject,
-    fetchAllProjects
+    fetchAllProjects,
+    getProjectById,
+    updateProject,
 };
