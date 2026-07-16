@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const Authroutes = require('./src/routes/auth.route');
 const projectRoutes = require('./src/routes/project.route');
 const taskRoutes = require('./src/routes/task.route');
@@ -7,6 +8,7 @@ const { notFound, centralErrorHandler } = require('./src/middlewares/error.middl
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
