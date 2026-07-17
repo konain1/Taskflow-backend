@@ -76,7 +76,12 @@ This is the backend server for **Taskflow**, a web application to manage project
   }
   ```
 
-#### 1.3 Test Auth Connection
+#### 1.3 Fetch All Users
+- **Method & Route**: `GET /taskflow/api/v1/users`
+- **Headers**:
+  - `Authorization: Bearer <JWT_TOKEN>` (Required)
+
+#### 1.4 Test Auth Connection
 - **Method & Route**: `GET /taskflow/api/v1/test`
 - **Headers**:
   - `Authorization: Bearer <JWT_TOKEN>` (Required - Only for Admins)

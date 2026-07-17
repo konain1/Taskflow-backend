@@ -101,7 +101,18 @@ const loginService = async (data) => {
     }
 };
 
+const getAllUsersService = async () => {
+    try {
+        const users = await User.find({}).select('-password');
+        return users;
+    } catch (error) {
+        logger.error(error, "Error in getAllUsersService");
+        throw error;
+    }
+};
+
 module.exports = {
     registerService,
     loginService,
+    getAllUsersService,
 };

@@ -1,5 +1,5 @@
 const logger = require("../config/logger");
-const { registerService, loginService } = require("../services/auth.service");
+const { registerService, loginService, getAllUsersService } = require("../services/auth.service");
 
 
 const register = async (req,res)=>{
@@ -51,7 +51,21 @@ const login = async (req, res) => {
     }
 }
 
+const getAllUsers = async (req, res, next) => {
+    try {
+        const response = await getAllUsersService();
+        return res.status(200).json({
+            success: true,
+            message: "Users fetched successfully",
+            data: response
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     register,
-    login
+    login,
+    getAllUsers,
 };
