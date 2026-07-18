@@ -53,15 +53,39 @@ const deleteService = async (projectId, userId, userRole) => {
     }
 };
 
-const fetchService = async (userId) => {
+const fetchService = async (userId, filters = {}) => {
     try {
-        const response = await Project.find({
+        const { page = 1, limit = 10, search } = filters;
+        const skip = (page - 1) * limit;
+
+        const query = {
             $or: [
                 { owner: userId },
                 { members: userId }
             ]
-        }).populate("owner", "-password").populate("members", "-password");
-        return response;
+        };
+
+        if (search) {
+            query.title = { $regex: search, $options: 'i' };
+        }
+
+        const totalProjects = await Project.countDocuments(query);
+        const totalPages = Math.ceil(totalProjects / limit);
+
+        const projects = await Project.find(query)
+            .skip(skip)
+            .limit(limit)
+            .populate("owner", "-password")
+            .populate("members", "-password")
+            .sort({ createdAt: -1 });
+
+        return {
+            projects,
+            totalProjects,
+            totalPages,
+            currentPage: page,
+            limit,
+        };
     } catch (error) {
         logger.error(error, "Error in project fetchService");
         throw error;

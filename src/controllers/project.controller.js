@@ -38,7 +38,15 @@ const deleteProject = async (req, res, next) => {
 
 const fetchAllProjects = async (req, res, next) => {
     try {
-        const response = await fetchService(req.user._id);
+        const { page = 1, limit = 10, search } = req.query;
+        
+        const filters = {
+            page: parseInt(page, 10),
+            limit: parseInt(limit, 10),
+            search
+        };
+
+        const response = await fetchService(req.user._id, filters);
         return res.status(200).json({
             success: true,
             message: "Projects fetched successfully",
